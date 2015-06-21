@@ -26,14 +26,14 @@ public class MainActivityFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
-        inflater.inflate(R.menu.fragment_menu, menu);
+        inflater.inflate(R.menu.menu_main, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
 
         int id = item.getItemId();
-        if(id == R.id.action_search){
+        if(id == R.id.action_settings){
             return true;
         }
         return super.onOptionsItemSelected(item);
