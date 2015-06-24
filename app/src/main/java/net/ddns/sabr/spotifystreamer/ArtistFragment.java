@@ -125,6 +125,7 @@ public class ArtistFragment extends Fragment {
                     e.printStackTrace();
                 }
 
+
                 SpotifyApi api = new SpotifyApi();
 
                 SpotifyService spotify = api.getService();
