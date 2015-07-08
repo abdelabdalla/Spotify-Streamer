@@ -127,7 +127,6 @@ public class Top10Activity extends ActionBarActivity {
 
             ArrayList<Song> songs = new ArrayList<>();
 
-            int i = 0;
 
             for(Track t : results.tracks){
                 Log.v("songs", t.name);
@@ -149,16 +148,11 @@ public class Top10Activity extends ActionBarActivity {
         @Override
         protected void onPostExecute(Song[] songs) {
 
-            if(songs != null){
-                songAdapter.clear();
-                songAdapter.addAll(songs);
-            }
-
-            if(songs.length == 0 && songs != null){
+            if(songs.length == 0){
                 songAdapter.clear();
                 t.show();
 
-            } else if(songs != null) {
+            } else {
                 songAdapter.clear();
                 songAdapter.addAll(songs);
             }
