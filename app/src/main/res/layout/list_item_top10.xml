@@ -17,8 +17,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="New Text"
-        android:id="@+id/artisttextView"
+        android:id="@+id/song_name"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/albumimage"
+        android:layout_toEndOf="@+id/albumimage" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/album_name"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/albumimage"
         android:layout_toEndOf="@+id/albumimage" />
+
 </RelativeLayout>
