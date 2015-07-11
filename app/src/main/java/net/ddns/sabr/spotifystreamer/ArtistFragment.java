@@ -36,7 +36,9 @@ public class ArtistFragment extends Fragment {
 
     Toast t;
 
-    Artists[] artistList = {new Artists("Enter Name Above","https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Aiga_uparrow.svg/500px-Aiga_uparrow.svg.png","")};
+    Artists[] artist = {new Artists("Enter Name Above","https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Aiga_uparrow.svg/500px-Aiga_uparrow.svg.png","")};
+
+    ArrayList<Artists> artistList;
 
     public String artistName = "";
     EditText search;
@@ -49,7 +51,16 @@ public class ArtistFragment extends Fragment {
         super.onCreate((savedInstanceState));
         setHasOptionsMenu(true);
 
-
+        if(savedInstanceState != null){
+            String[] names = savedInstanceState.getStringArray("names");
+            String[] name =savedInstanceState.getStringArray("names");
+            String[] imgLocs = savedInstanceState.getStringArray("imgLocs");
+            String[] id = savedInstanceState.getStringArray("id");
+            artist = new Artists[name.length];
+            for (int i = 0; i < name.length; i++) {
+                artist[i] = new Artists(name[i], imgLocs[i], id[i]);
+            }
+        }
     }
 
     @Override
@@ -79,7 +90,7 @@ public class ArtistFragment extends Fragment {
 
         search = (EditText) rootView.findViewById(R.id.artistSearch);
 
-        ArrayList<Artists> a = new ArrayList<>(Arrays.asList(artistList));
+        ArrayList<Artists> a = new ArrayList<>(Arrays.asList(artist));
         artistAdapter = new ArtistAdapter(getActivity(), a);
 
         ListView listView = (ListView) rootView.findViewById(R.id.artist_list_view);
@@ -178,16 +189,22 @@ public class ArtistFragment extends Fragment {
 
                 Artists[] list;
 
-                if (params[0].bundle != null) {
+                if (!isConnected()) {
+/*
                     String[] name = params[0].bundle.getStringArray("names");
                     String[] imgLocs = params[0].bundle.getStringArray("imgLocs");
                     String[] id = params[0].bundle.getStringArray("id");
                     list = new Artists[name.length];
                     for (int i = 0; i < name.length; i++) {
                         list[i] = new Artists(name[i], imgLocs[i], id[i]);
+                    }*/
+                    if(params[0].bundle == null){
+                        artist = new Artists[1];
+                        artist[0] = new Artists("Enter Name Above","https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Aiga_uparrow.svg/500px-Aiga_uparrow.svg.png","");
                     }
-                    params[0].bundle = null;
+                    list = artist;
                 }
+
 
                 else {
                     SpotifyApi api = new SpotifyApi();
@@ -196,7 +213,7 @@ public class ArtistFragment extends Fragment {
 
                     ArtistsPager results = spotify.searchArtists(params[0].name);
 
-                    ArrayList<Artists> artistList = new ArrayList<Artists>();
+                    artistList = new ArrayList<Artists>();
 
                     int i = 0;
 
