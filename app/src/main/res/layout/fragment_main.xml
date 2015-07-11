@@ -3,14 +3,8 @@
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivityFragment">
-
-    <ListView
-        android:id="@+id/artist_list_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/artistSearch">
-    </ListView>
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivityFragment"
+    android:focusable="true" android:focusableInTouchMode="true">
 
     <EditText
         android:layout_width="wrap_content"
@@ -23,6 +17,13 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:hint="Search for musician..." />
+
+    <ListView
+        android:id="@+id/artist_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/artistSearch">
+    </ListView>
 
 
 

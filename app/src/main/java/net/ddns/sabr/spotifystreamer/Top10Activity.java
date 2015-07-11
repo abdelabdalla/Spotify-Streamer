@@ -94,7 +94,7 @@ public class Top10Activity extends ActionBarActivity {
                 listView.setAdapter(songAdapter);
 
                 FetchSongsClass f = new FetchSongsClass();
-                f.execute(artistName);
+                f.execute(new myTask(savedInstanceState,artistName));
 
             }
 
@@ -102,45 +102,88 @@ public class Top10Activity extends ActionBarActivity {
         }
     }
 
-    public static class FetchSongsClass extends AsyncTask<String, Void, Song[]>{
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        Log.v("f", "at save");
+
+        String[] names = new String[songAdapter.getCount()];
+        String[] albums = new String[songAdapter.getCount()];
+        String[] imgLocs = new String[songAdapter.getCount()];
+
+        for(int i = 0; i < songAdapter.getCount(); i++){
+            names[i] = songAdapter.getItem(i).name;
+            imgLocs[i] = songAdapter.getItem(i).imgLoc;
+            albums[i] = songAdapter.getItem(i).album;
+        }
+
+        savedInstanceState.putStringArray("names",names);
+        savedInstanceState.putStringArray("imgLocs",imgLocs);
+        savedInstanceState.putStringArray("albums",albums);
+
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    private static class myTask{
+        Bundle bundle;
+        String name;
+        myTask(Bundle bundle, String name){
+            this.bundle = bundle;
+            this.name = name;
+        }
+    }
+
+    public static class FetchSongsClass extends AsyncTask<myTask, Void, Song[]>{
 
 
         @Override
-        protected Song[] doInBackground(String... params) {
+        protected Song[] doInBackground(myTask... params) {
+
+            Song[] list;
 
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            if(params[0].bundle == null) {
+                SpotifyApi api = new SpotifyApi();
+                SpotifyService spotify = api.getService();
 
-            SpotifyApi api = new SpotifyApi();
-            SpotifyService spotify = api.getService();
-
-            Map<String, Object> m = new HashMap<>();
-            if(Locale.getDefault().getCountry().equals("")){
-                m.put("country", "US");
-            } else {
-                m.put("country", Locale.getDefault().getCountry());
-            }
-            Tracks results = spotify.getArtistTopTrack(params[0], m);
-
-            ArrayList<Song> songs = new ArrayList<>();
-
-
-            for(Track t : results.tracks){
-                Log.v("songs", t.name);
-
-                if (t.album.images.size() > 0) {
-                    songs.add(new Song(t.name,t.album.name,t.album.images.get(0).url));
+                Map<String, Object> m = new HashMap<>();
+                if (Locale.getDefault().getCountry().equals("")) {
+                    m.put("country", "US");
                 } else {
-                    songs.add(new Song(t.name,t.album.name,""));
+                    m.put("country", Locale.getDefault().getCountry());
+                }
+                Tracks results = spotify.getArtistTopTrack(params[0].name, m);
+
+                ArrayList<Song> songs = new ArrayList<>();
+
+
+                for (Track t : results.tracks) {
+                    Log.v("songs", t.name);
+
+                    if (t.album.images.size() > 0) {
+                        songs.add(new Song(t.name, t.album.name, t.album.images.get(0).url));
+                    } else {
+                        songs.add(new Song(t.name, t.album.name, ""));
+                    }
+
+                }
+
+                list = new Song[songs.size()];
+                list = songs.toArray(list);
+            } else{
+
+                String[] name = params[0].bundle.getStringArray("names");
+                String[] imgLocs = params[0].bundle.getStringArray("imgLocs");
+                String[] albums = params[0].bundle.getStringArray("albums");
+                list = new Song[name.length];
+                for(int i = 0; i < name.length; i++){
+                    list[i] = new Song(name[i],albums[i],imgLocs[i]);
                 }
 
             }
-
-            Song[] list = new Song[songs.size()];
-            list = songs.toArray(list);
 
             return list;
         }
