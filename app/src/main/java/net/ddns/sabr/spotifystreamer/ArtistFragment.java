@@ -223,6 +223,7 @@ public class ArtistFragment extends Fragment {
 
                     int i = 0;
 
+
                     for (ArtistSimple a : results.artists.items) {
                         //Log.v("nameArt", a.name);
                         Artist a2 = results.artists.items.get(i);
