@@ -52,7 +52,6 @@ public class ArtistFragment extends Fragment {
         setHasOptionsMenu(true);
 
         if(savedInstanceState != null){
-            String[] names = savedInstanceState.getStringArray("names");
             String[] name =savedInstanceState.getStringArray("names");
             String[] imgLocs = savedInstanceState.getStringArray("imgLocs");
             String[] id = savedInstanceState.getStringArray("id");
@@ -211,6 +210,13 @@ public class ArtistFragment extends Fragment {
 
                     SpotifyService spotify = api.getService();
 
+                    Log.v("name", params[0].name);
+
+                    if(params[0].name.equals("")){
+                        //list = new Artists[1];
+                        list = artist;
+                    } else{
+
                     ArtistsPager results = spotify.searchArtists(params[0].name);
 
                     artistList = new ArrayList<Artists>();
@@ -230,7 +236,7 @@ public class ArtistFragment extends Fragment {
                     }
 
                     list = new Artists[artistList.size()];
-                    list = artistList.toArray(list);
+                    list = artistList.toArray(list);}
                 }
                 return list;
             }
