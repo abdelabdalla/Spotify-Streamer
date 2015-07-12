@@ -1,6 +1,10 @@
 package net.ddns.sabr.spotifystreamer;
 
+import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,6 +18,8 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -30,6 +36,8 @@ public class Top10Activity extends ActionBarActivity {
 
     static Toast t;
 
+    static Song[] songs = {new Song("Name","Album","")};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +46,19 @@ public class Top10Activity extends ActionBarActivity {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
+        } else {
+
+            String[] name =savedInstanceState.getStringArray("namesSong");
+            String[] imgLocs = savedInstanceState.getStringArray("imgLocsSong");
+            String[] album = savedInstanceState.getStringArray("albumsSong");
+            songs = new Song[name.length];
+            for (int i = 0; i < name.length; i++) {
+                songs[i] = new Song(name[i],album[i], imgLocs[i]);
+            }
+
+            /*getSupportFragmentManager().beginTransaction()
+                    .add(R.id.container, new PlaceholderFragment())
+                    .commit();*/
         }
     }
 
@@ -116,9 +137,9 @@ public class Top10Activity extends ActionBarActivity {
             albums[i] = songAdapter.getItem(i).album;
         }
 
-        savedInstanceState.putStringArray("names",names);
-        savedInstanceState.putStringArray("imgLocs",imgLocs);
-        savedInstanceState.putStringArray("albums",albums);
+        savedInstanceState.putStringArray("namesSong",names);
+        savedInstanceState.putStringArray("imgLocsSong",imgLocs);
+        savedInstanceState.putStringArray("albumsSong",albums);
 
         super.onSaveInstanceState(savedInstanceState);
     }
@@ -130,6 +151,38 @@ public class Top10Activity extends ActionBarActivity {
             this.bundle = bundle;
             this.name = name;
         }
+    }
+
+    static boolean isConnected(){
+        //http://developer.android.com/training/monitoring-device-state/connectivity-monitoring.html
+        ConnectivityManager cm =
+                (ConnectivityManager)cont().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+        return isConnected;
+    }
+
+    static Application cont(){
+        //http://stackoverflow.com/a/12495865/1695220
+        try {
+            final Class<?> activityThreadClass =
+                    Class.forName("android.app.ActivityThread");
+            final Method method = activityThreadClass.getMethod("currentApplication");
+            return (Application) method.invoke(null, (Object[]) null);
+        } catch (final ClassNotFoundException e) {
+            // handle exception
+        } catch (final NoSuchMethodException e) {
+            // handle exception
+        } catch (final IllegalArgumentException e) {
+            // handle exception
+        } catch (final IllegalAccessException e) {
+            // handle exception
+        } catch (final InvocationTargetException e) {
+            // handle exception
+        }
+        return null;
     }
 
     public static class FetchSongsClass extends AsyncTask<myTask, Void, Song[]>{
@@ -145,7 +198,47 @@ public class Top10Activity extends ActionBarActivity {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            if(params[0].bundle == null) {
+
+            if(!isConnected()){
+
+                if(params[0].bundle == null){
+                    songs = new Song[1];
+                    songs[0] = new Song("Name","Album","");
+                }
+                list = songs;
+
+            } else{
+                SpotifyApi api = new SpotifyApi();
+                SpotifyService spotify = api.getService();
+
+                Map<String, Object> m = new HashMap<>();
+                if (Locale.getDefault().getCountry().equals("")) {
+                    m.put("country", "US");
+                } else {
+                    m.put("country", Locale.getDefault().getCountry());
+                }
+                Tracks results = spotify.getArtistTopTrack(params[0].name, m);
+
+                ArrayList<Song> songs = new ArrayList<>();
+
+
+                for (Track t : results.tracks) {
+                    Log.v("songs", t.name);
+
+                    if (t.album.images.size() > 0) {
+                        songs.add(new Song(t.name, t.album.name, t.album.images.get(0).url));
+                    } else {
+                        songs.add(new Song(t.name, t.album.name, ""));
+                    }
+
+                }
+
+                list = new Song[songs.size()];
+                list = songs.toArray(list);
+            }
+
+
+            /*if(params[0].bundle == null) {
                 SpotifyApi api = new SpotifyApi();
                 SpotifyService spotify = api.getService();
 
@@ -175,15 +268,15 @@ public class Top10Activity extends ActionBarActivity {
                 list = songs.toArray(list);
             } else{
 
-                String[] name = params[0].bundle.getStringArray("names");
-                String[] imgLocs = params[0].bundle.getStringArray("imgLocs");
-                String[] albums = params[0].bundle.getStringArray("albums");
+                String[] name = params[0].bundle.getStringArray("namesSong");
+                String[] imgLocs = params[0].bundle.getStringArray("imgLocsSong");
+                String[] albums = params[0].bundle.getStringArray("albumsSong");
                 list = new Song[name.length];
                 for(int i = 0; i < name.length; i++){
                     list[i] = new Song(name[i],albums[i],imgLocs[i]);
                 }
 
-            }
+            }*/
 
             return list;
         }

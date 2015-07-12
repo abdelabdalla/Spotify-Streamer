@@ -16,7 +16,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:hint="Search for musician..." />
+        android:hint="Search for musician..."/>
 
     <ListView
         android:id="@+id/artist_list_view"
