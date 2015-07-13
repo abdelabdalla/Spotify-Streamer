@@ -43,6 +43,8 @@ public class ArtistFragment extends Fragment {
     public String artistName = "";
     EditText search;
 
+
+
     public ArtistFragment() {
     }
 

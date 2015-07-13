@@ -199,15 +199,14 @@ public class Top10Activity extends ActionBarActivity {
                 e.printStackTrace();
             }
 
-            if(!isConnected()){
-
-                if(params[0].bundle == null){
+            if(params[0].bundle != null){
+                list = songs;
+            } else if(!isConnected()){
                     songs = new Song[1];
                     songs[0] = new Song("Name","Album","");
-                }
                 list = songs;
-
-            } else{
+            }
+            else {
                 SpotifyApi api = new SpotifyApi();
                 SpotifyService spotify = api.getService();
 
