@@ -1,8 +1,5 @@
 package net.ddns.sabr.spotifystreamer;
 
-/**
- * Created by Abdel on 07/07/2015.
- */
 public class Song {
 
     public String name;

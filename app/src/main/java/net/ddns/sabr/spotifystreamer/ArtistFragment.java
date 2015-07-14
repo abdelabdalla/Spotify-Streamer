@@ -41,7 +41,6 @@ public class ArtistFragment extends Fragment {
     ArrayList<Artists> artistList;
     ArrayList<Artists> artistListt;
 
-    public String artistName = "";
     EditText search;
 
     public ArtistFragment() {
@@ -71,7 +70,6 @@ public class ArtistFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
 
-        int id = item.getItemId();
 
         return super.onOptionsItemSelected(item);
     }
@@ -81,8 +79,6 @@ public class ArtistFragment extends Fragment {
                              final Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
-        Log.v("files",getActivity().getFilesDir().getPath() +"  "+getActivity().getFilesDir().toString());
 
         t = Toast.makeText(getActivity(), "This isn't a real artist :( try again", Toast.LENGTH_SHORT);
 

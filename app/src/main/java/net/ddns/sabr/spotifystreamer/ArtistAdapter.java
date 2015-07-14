@@ -21,9 +21,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
-/**
- * Created by Abdel on 24/06/2015.
- */
 public class ArtistAdapter extends ArrayAdapter<Artists>{
 
     public ArtistAdapter(Context c, ArrayList<Artists> artists){
@@ -45,7 +42,7 @@ public class ArtistAdapter extends ArrayAdapter<Artists>{
         name.setText(artist.name);
         if(!artist.imgLoc.equals("")) {
             String filename = artist.imgLoc.replace("/","\\");
-            File f = new File(getContext().getFilesDir().getPath() + "/" + artist.imgLoc);
+            File f = new File(getContext().getFilesDir().getPath() + "/" + filename);
             Uri uri = Uri.fromFile(f);
             if(f.exists()){
                 Picasso.with(getContext()).load(uri);
