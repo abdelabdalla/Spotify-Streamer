@@ -39,11 +39,10 @@ public class ArtistFragment extends Fragment {
     Artists[] artist = {new Artists("Enter Name Above","https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Aiga_uparrow.svg/500px-Aiga_uparrow.svg.png","")};
 
     ArrayList<Artists> artistList;
+    ArrayList<Artists> artistListt;
 
     public String artistName = "";
     EditText search;
-
-
 
     public ArtistFragment() {
     }
@@ -97,6 +96,25 @@ public class ArtistFragment extends Fragment {
         ListView listView = (ListView) rootView.findViewById(R.id.artist_list_view);
         listView.setAdapter(artistAdapter);
 
+        Intent intent = getActivity().getIntent();
+
+        if(intent != null && intent.hasExtra("names")){
+            Log.v("home","home");
+            artistListt = new ArrayList<>();
+                //artistList.clear();
+            String [] names  = intent.getStringArrayExtra("names");
+            String [] img = intent.getStringArrayExtra("imgLocs");
+            String [] ids = intent.getStringArrayExtra("ids");
+            Log.v("array",names[0]);
+            Log.v("array",img[0]);
+            Log.v("array",ids[0]);
+            for(int i = 0; i < names.length; i++){
+                artistListt.add(new Artists(names[i], img[i], ids[i]));
+            }
+            artistAdapter.clear();
+            artistAdapter.addAll(artistListt);
+        }
+
         search.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -121,11 +139,20 @@ public class ArtistFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(artistAdapter.getItem(position).name.equals("Enter Name Above")){
-
                     t.show();
                 } else {
-                    String t = artistAdapter.getItem(position).id;
-                    Intent intent = new Intent(getActivity(), Top10Activity.class).putExtra(Intent.EXTRA_TEXT, t);
+                    String[] t = {artistAdapter.getItem(position).id,artistAdapter.getItem(position).name};
+
+                    String[] names = new String[artistAdapter.getCount()];
+                    String[] imgLocs = new String[artistAdapter.getCount()];
+                    String[] ids = new String[artistAdapter.getCount()];
+
+                    for(int i = 0; i < artistAdapter.getCount(); i++){
+                        names[i] = artistAdapter.getItem(i).name;
+                        imgLocs[i] = artistAdapter.getItem(i).imgLoc;
+                        ids[i] = artistAdapter.getItem(i).id;
+                    }
+                    Intent intent = new Intent(getActivity(), Top10Activity.class).putExtra("t", t).putExtra("names", names).putExtra("imgLocs",imgLocs).putExtra("ids",ids);
                     startActivity(intent);
                 }
 
@@ -159,6 +186,7 @@ public class ArtistFragment extends Fragment {
     }
 
     boolean isConnected(){
+        try{
         //http://developer.android.com/training/monitoring-device-state/connectivity-monitoring.html
         ConnectivityManager cm =
                 (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -166,7 +194,10 @@ public class ArtistFragment extends Fragment {
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
-        return isConnected;
+        return isConnected;}
+        catch (NullPointerException e){
+            return false;
+        }
     }
 
     private class myTask{
@@ -190,7 +221,11 @@ public class ArtistFragment extends Fragment {
 
                 Artists[] list;
 
-                if (!isConnected()) {
+/*                if(artistListt != null && !artistListt.isEmpty()){
+                    list = new Artists[artistListt.size()];
+                    list = artistList.toArray(list);
+                    artistListt.clear();
+                } else */if (!isConnected()) {
 /*
                     String[] name = params[0].bundle.getStringArray("names");
                     String[] imgLocs = params[0].bundle.getStringArray("imgLocs");
@@ -219,8 +254,17 @@ public class ArtistFragment extends Fragment {
                         list = artist;
                     } else{
 
-                    ArtistsPager results = spotify.searchArtists(params[0].name);
+                        ArtistsPager results = null;
 
+                        try {
+                            results = spotify.searchArtists(params[0].name);
+                        } catch(RuntimeException e){
+                            if(e.toString().contains("503")){
+                                Toast err = Toast.makeText(getActivity(), "The servers are unavailable at this time", Toast.LENGTH_SHORT);
+                                err.show();
+                            }
+
+                        }
                     artistList = new ArrayList<Artists>();
 
                     int i = 0;

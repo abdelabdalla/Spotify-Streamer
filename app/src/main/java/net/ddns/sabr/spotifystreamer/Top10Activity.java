@@ -8,6 +8,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,6 +39,10 @@ public class Top10Activity extends ActionBarActivity {
 
     static Song[] songs = {new Song("Name","Album","")};
 
+    static String[] namesArtists;
+    static String[] imgLocsArtists;
+    static String[] idsArtists;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,11 +51,17 @@ public class Top10Activity extends ActionBarActivity {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new PlaceholderFragment())
                     .commit();
+
         } else {
 
-            String[] name =savedInstanceState.getStringArray("namesSong");
+            String[] name = savedInstanceState.getStringArray("namesSong");
             String[] imgLocs = savedInstanceState.getStringArray("imgLocsSong");
             String[] album = savedInstanceState.getStringArray("albumsSong");
+
+            namesArtists = savedInstanceState.getStringArray("namesArtists");
+            imgLocsArtists  = savedInstanceState.getStringArray("imgLocsArtists");
+            idsArtists = savedInstanceState.getStringArray("idsArtists");
+
             songs = new Song[name.length];
             for (int i = 0; i < name.length; i++) {
                 songs[i] = new Song(name[i],album[i], imgLocs[i]);
@@ -78,7 +89,13 @@ public class Top10Activity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if(id == android.R.id.home){
+
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class).putExtra("names",namesArtists).putExtra("imgLocs",imgLocsArtists).putExtra("ids",idsArtists);
+            startActivity(intent);
+
+            return true;
+        } else if (id == R.id.action_settings) {
             return true;
         }
 
@@ -102,10 +119,16 @@ public class Top10Activity extends ActionBarActivity {
 
             t = Toast.makeText(getActivity(), "Unable to fetch top tracks :(", Toast.LENGTH_SHORT);
 
-            if(intent != null && intent.hasExtra(Intent.EXTRA_TEXT)){
+            if(intent != null && intent.hasExtra("t")){
 
-                String artistName = intent.getStringExtra(Intent.EXTRA_TEXT);
-                //((TextView) rootView.findViewById(R.id.artistText)).setText(artistName);
+                String[] artistExtra = intent.getStringArrayExtra("t");
+
+                namesArtists = intent.getStringArrayExtra("names");
+                imgLocsArtists = intent.getStringArrayExtra("imgLocs");
+                idsArtists = intent.getStringArrayExtra("ids");
+
+                ActionBar bar = ((ActionBarActivity)getActivity()).getSupportActionBar();
+                bar.setSubtitle(artistExtra[1]);
 
                 ArrayList<Song> songs = new ArrayList<>();
                 //songs.add(new Song("name","album",""));
@@ -115,7 +138,7 @@ public class Top10Activity extends ActionBarActivity {
                 listView.setAdapter(songAdapter);
 
                 FetchSongsClass f = new FetchSongsClass();
-                f.execute(new myTask(savedInstanceState,artistName));
+                f.execute(new myTask(savedInstanceState,artistExtra[0]));
 
             }
 
@@ -140,6 +163,10 @@ public class Top10Activity extends ActionBarActivity {
         savedInstanceState.putStringArray("namesSong",names);
         savedInstanceState.putStringArray("imgLocsSong",imgLocs);
         savedInstanceState.putStringArray("albumsSong",albums);
+
+        savedInstanceState.putStringArray("namesArtists",namesArtists);
+        savedInstanceState.putStringArray("imgLocsArtists",imgLocsArtists);
+        savedInstanceState.putStringArray("idsArtists",idsArtists);
 
         super.onSaveInstanceState(savedInstanceState);
     }
@@ -173,14 +200,12 @@ public class Top10Activity extends ActionBarActivity {
             return (Application) method.invoke(null, (Object[]) null);
         } catch (final ClassNotFoundException e) {
             // handle exception
-        } catch (final NoSuchMethodException e) {
-            // handle exception
-        } catch (final IllegalArgumentException e) {
-            // handle exception
-        } catch (final IllegalAccessException e) {
-            // handle exception
-        } catch (final InvocationTargetException e) {
-            // handle exception
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
         return null;
     }
