@@ -72,11 +72,7 @@ public class ArtistFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item){
 
         int id = item.getItemId();
-        if(id == R.id.action_refresh){
-            FetchArtistClass fetch = new FetchArtistClass();
-            fetch.execute(new myTask(null,artistName));
-            return true;
-        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -85,6 +81,8 @@ public class ArtistFragment extends Fragment {
                              final Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+        Log.v("files",getActivity().getFilesDir().getPath() +"  "+getActivity().getFilesDir().toString());
 
         t = Toast.makeText(getActivity(), "This isn't a real artist :( try again", Toast.LENGTH_SHORT);
 

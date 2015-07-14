@@ -95,8 +95,6 @@ public class Top10Activity extends ActionBarActivity {
             startActivity(intent);
 
             return true;
-        } else if (id == R.id.action_settings) {
-            return true;
         }
 
         return super.onOptionsItemSelected(item);
