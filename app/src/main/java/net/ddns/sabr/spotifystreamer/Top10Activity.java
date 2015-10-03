@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -37,7 +38,7 @@ public class Top10Activity extends ActionBarActivity {
 
     static Toast t;
 
-    static Song[] songs = {new Song("Name","Album","")};
+    static Song[] songs = {new Song("Name","Album","","")};
 
     static String[] namesArtists;
     static String[] imgLocsArtists;
@@ -57,6 +58,7 @@ public class Top10Activity extends ActionBarActivity {
             String[] name = savedInstanceState.getStringArray("namesSong");
             String[] imgLocs = savedInstanceState.getStringArray("imgLocsSong");
             String[] album = savedInstanceState.getStringArray("albumsSong");
+            String[] url = savedInstanceState.getStringArray("urlSong");
 
             namesArtists = savedInstanceState.getStringArray("namesArtists");
             imgLocsArtists  = savedInstanceState.getStringArray("imgLocsArtists");
@@ -64,7 +66,7 @@ public class Top10Activity extends ActionBarActivity {
 
             songs = new Song[name.length];
             for (int i = 0; i < name.length; i++) {
-                songs[i] = new Song(name[i],album[i], imgLocs[i]);
+                songs[i] = new Song(name[i],album[i], imgLocs[i], url[i]);
             }
 
             /*getSupportFragmentManager().beginTransaction()
@@ -117,9 +119,13 @@ public class Top10Activity extends ActionBarActivity {
 
             t = Toast.makeText(getActivity(), "Unable to fetch top tracks :(", Toast.LENGTH_SHORT);
 
+            ListView listView = (ListView) rootView.findViewById(R.id.listView);
+
+            String[] artistExtra;
+
             if(intent != null && intent.hasExtra("t")){
 
-                String[] artistExtra = intent.getStringArrayExtra("t");
+                artistExtra = intent.getStringArrayExtra("t");
 
                 namesArtists = intent.getStringArrayExtra("names");
                 imgLocsArtists = intent.getStringArrayExtra("imgLocs");
@@ -132,13 +138,42 @@ public class Top10Activity extends ActionBarActivity {
                 //songs.add(new Song("name","album",""));
                 songAdapter = new SongAdapter(getActivity(), songs);
 
-                ListView listView = (ListView) rootView.findViewById(R.id.listView);
                 listView.setAdapter(songAdapter);
 
                 FetchSongsClass f = new FetchSongsClass();
                 f.execute(new myTask(savedInstanceState,artistExtra[0]));
 
+            } else if(savedInstanceState != null){
+                artistExtra = savedInstanceState.getStringArray("t");
+
+                namesArtists = savedInstanceState.getStringArray("names");
+                imgLocsArtists = savedInstanceState.getStringArray("imgLocs");
+                idsArtists = savedInstanceState.getStringArray("ids");
+
+                ActionBar bar = ((ActionBarActivity)getActivity()).getSupportActionBar();
+                bar.setSubtitle(artistExtra[1]);
+
+                ArrayList<Song> songs = new ArrayList<>();
+                //songs.add(new Song("name","album",""));
+                songAdapter = new SongAdapter(getActivity(), songs);
+
+                listView.setAdapter(songAdapter);
+
+                FetchSongsClass f = new FetchSongsClass();
+                f.execute(new myTask(savedInstanceState,artistExtra[0]));
             }
+
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    String[] songToPlay = {songs[position].getName(),songs[position].getAlbum(),songs[position].getImgLoc(),songs[position].getUrl()};
+
+                    Intent intent = new Intent(getActivity(), PlayerActivity.class).putExtra("songToPlay",songToPlay);
+                    startActivity(intent);
+
+                }
+            });
 
             return rootView;
         }
@@ -151,16 +186,19 @@ public class Top10Activity extends ActionBarActivity {
         String[] names = new String[songAdapter.getCount()];
         String[] albums = new String[songAdapter.getCount()];
         String[] imgLocs = new String[songAdapter.getCount()];
+        String[] url = new String[songAdapter.getCount()];
 
         for(int i = 0; i < songAdapter.getCount(); i++){
             names[i] = songAdapter.getItem(i).name;
             imgLocs[i] = songAdapter.getItem(i).imgLoc;
             albums[i] = songAdapter.getItem(i).album;
+            url[i] = songAdapter.getItem(i).url;
         }
 
         savedInstanceState.putStringArray("namesSong",names);
         savedInstanceState.putStringArray("imgLocsSong",imgLocs);
         savedInstanceState.putStringArray("albumsSong",albums);
+        savedInstanceState.putStringArray("urlSong",url);
 
         savedInstanceState.putStringArray("namesArtists",namesArtists);
         savedInstanceState.putStringArray("imgLocsArtists",imgLocsArtists);
@@ -226,7 +264,7 @@ public class Top10Activity extends ActionBarActivity {
                 list = songs;
             } else if(!isConnected()){
                     songs = new Song[1];
-                    songs[0] = new Song("Name","Album","");
+                    songs[0] = new Song("Name","Album","","");
                 list = songs;
             }
             else {
@@ -248,9 +286,9 @@ public class Top10Activity extends ActionBarActivity {
                     Log.v("songs", t.name);
 
                     if (t.album.images.size() > 0) {
-                        songs.add(new Song(t.name, t.album.name, t.album.images.get(0).url));
+                        songs.add(new Song(t.name, t.album.name, t.album.images.get(0).url, t.preview_url));
                     } else {
-                        songs.add(new Song(t.name, t.album.name, ""));
+                        songs.add(new Song(t.name, t.album.name, "", t.preview_url));
                     }
 
                 }

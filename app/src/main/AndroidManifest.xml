@@ -19,6 +19,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".PlayerActivity"
+            android:label="Player"
+            android:parentActivityName=".Top10Activity"/>
+
         <activity
             android:name=".Top10Activity"
             android:label="@string/title_activity_top10"

@@ -1,11 +1,17 @@
 package net.ddns.sabr.spotifystreamer;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.app.LoaderManager;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,6 +27,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -42,6 +50,10 @@ public class ArtistFragment extends Fragment {
     ArrayList<Artists> artistListt;
 
     EditText search;
+
+    String [] names;
+    String [] img;
+    String [] ids;
 
     public ArtistFragment() {
     }
@@ -96,9 +108,9 @@ public class ArtistFragment extends Fragment {
             Log.v("home","home");
             artistListt = new ArrayList<>();
                 //artistList.clear();
-            String [] names  = intent.getStringArrayExtra("names");
-            String [] img = intent.getStringArrayExtra("imgLocs");
-            String [] ids = intent.getStringArrayExtra("ids");
+            names  = intent.getStringArrayExtra("names");
+            img = intent.getStringArrayExtra("imgLocs");
+            ids = intent.getStringArrayExtra("ids");
             Log.v("array",names[0]);
             Log.v("array",img[0]);
             Log.v("array",ids[0]);
@@ -111,43 +123,64 @@ public class ArtistFragment extends Fragment {
 
         search.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        if (isConnected()) {
-                            FetchArtistClass fetch = new FetchArtistClass();
-                            myTask m = new myTask(savedInstanceState,s.toString());
-                            fetch.execute(m);
-                    } else {
-                        Toast.makeText(getActivity(), "No Internet", Toast.LENGTH_SHORT).show();
-                    }
+                if (isConnected()) {
+                    FetchArtistClass fetch = new FetchArtistClass();
+                    myTask m = new myTask(savedInstanceState, s.toString());
+                    fetch.execute(m);
+                } else {
+                    Toast.makeText(getActivity(), "No Internet", Toast.LENGTH_SHORT).show();
+                }
 
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(artistAdapter.getItem(position).name.equals("Enter Name Above")){
+                if (artistAdapter.getItem(position).name.equals("Enter Name Above")) {
                     t.show();
                 } else {
-                    String[] t = {artistAdapter.getItem(position).id,artistAdapter.getItem(position).name};
+                    String[] t = {artistAdapter.getItem(position).id, artistAdapter.getItem(position).name};
 
-                    String[] names = new String[artistAdapter.getCount()];
-                    String[] imgLocs = new String[artistAdapter.getCount()];
-                    String[] ids = new String[artistAdapter.getCount()];
+                    names = new String[artistAdapter.getCount()];
+                    img = new String[artistAdapter.getCount()];
+                    ids = new String[artistAdapter.getCount()];
 
-                    for(int i = 0; i < artistAdapter.getCount(); i++){
+                    for (int i = 0; i < artistAdapter.getCount(); i++) {
                         names[i] = artistAdapter.getItem(i).name;
-                        imgLocs[i] = artistAdapter.getItem(i).imgLoc;
+                        img[i] = artistAdapter.getItem(i).imgLoc;
                         ids[i] = artistAdapter.getItem(i).id;
                     }
-                    Intent intent = new Intent(getActivity(), Top10Activity.class).putExtra("t", t).putExtra("names", names).putExtra("imgLocs",imgLocs).putExtra("ids",ids);
-                    startActivity(intent);
+
+                    if(MainActivity.mTwoPane){
+
+                        Bundle b = new Bundle();
+                        b.putStringArray("t",t);
+                        b.putStringArray("names",names);
+                        b.putStringArray("imgLocs", img);
+                        b.putStringArray("ids", ids);
+
+                        Top10Activity.Top10Fragment t10 = new Top10Activity.Top10Fragment();
+                        t10.setArguments(b);
+                        android.support.v4.app.FragmentManager m = getFragmentManager();
+                        android.support.v4.app.FragmentTransaction ft = m.beginTransaction();
+                        ft.replace(R.id.top10_container, t10).addToBackStack("t10").commit();
+
+                    } else {
+                        Intent intent = new Intent(getActivity(), Top10Activity.class).putExtra("t", t).putExtra("names", names).putExtra("imgLocs",img).putExtra("ids",ids);
+                        startActivity(intent);
+                    }
+
+                    //((Callback) getActivity()).onItemSelected(t, names, img, ids);
                 }
 
             }
@@ -201,6 +234,8 @@ public class ArtistFragment extends Fragment {
             this.bundle = bundle;
             this.name = name;
         }
+
+
     }
 
     public class FetchArtistClass extends AsyncTask<myTask, Void, Artists[]> {

@@ -7,7 +7,7 @@ import android.view.Menu;
 
 public class MainActivity extends ActionBarActivity {
 
-    private boolean mTwoPane;
+    public static boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +39,12 @@ public class MainActivity extends ActionBarActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        //String[][] d =
     }
 
 }
