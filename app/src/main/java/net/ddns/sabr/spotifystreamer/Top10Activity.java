@@ -121,7 +121,7 @@ public class Top10Activity extends ActionBarActivity {
 
             ListView listView = (ListView) rootView.findViewById(R.id.listView);
 
-            String[] artistExtra;
+            final String[] artistExtra;
 
             if(intent != null && intent.hasExtra("t")){
 
@@ -143,6 +143,20 @@ public class Top10Activity extends ActionBarActivity {
                 FetchSongsClass f = new FetchSongsClass();
                 f.execute(new myTask(savedInstanceState,artistExtra[0]));
 
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+
+                        Song a = songAdapter.getItem(position);
+                        String[] songToPlay = {a.getName(), a.getAlbum(), a.getImgLoc(), a.getUrl(), artistExtra[1]};
+
+                        Intent intent = new Intent(getActivity(), PlayerActivity.class).putExtra("songToPlay", songToPlay);
+                        startActivity(intent);
+
+                    }
+                });
+
             } else if(savedInstanceState != null){
                 artistExtra = savedInstanceState.getStringArray("t");
 
@@ -161,19 +175,21 @@ public class Top10Activity extends ActionBarActivity {
 
                 FetchSongsClass f = new FetchSongsClass();
                 f.execute(new myTask(savedInstanceState,artistExtra[0]));
+
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+
+                        Song a = songAdapter.getItem(position);
+                        String[] songToPlay = {a.getName(), a.getAlbum(), a.getImgLoc(), a.getUrl(),artistExtra[1]};
+
+                        Intent intent = new Intent(getActivity(), PlayerActivity.class).putExtra("songToPlay", songToPlay);
+                        startActivity(intent);
+
+                    }
+                });
             }
-
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                    String[] songToPlay = {songs[position].getName(),songs[position].getAlbum(),songs[position].getImgLoc(),songs[position].getUrl()};
-
-                    Intent intent = new Intent(getActivity(), PlayerActivity.class).putExtra("songToPlay",songToPlay);
-                    startActivity(intent);
-
-                }
-            });
 
             return rootView;
         }

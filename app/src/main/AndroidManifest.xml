@@ -19,12 +19,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".PlayerActivity"
-            android:label="Player"
-            android:parentActivityName=".Top10Activity"/>
-
         <activity
             android:name=".Top10Activity"
             android:label="@string/title_activity_top10"
@@ -32,6 +26,14 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="MainActivity" />
+        </activity>
+        <activity
+            android:name=".PlayerActivity"
+            android:label="@string/title_activity_player"
+            android:parentActivityName=".Top10Activity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.ddns.sabr.spotifystreamer.Top10Activity" />
         </activity>
     </application>
 
