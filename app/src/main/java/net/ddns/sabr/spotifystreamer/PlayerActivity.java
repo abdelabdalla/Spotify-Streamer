@@ -2,9 +2,12 @@ package net.ddns.sabr.spotifystreamer;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -65,7 +68,8 @@ public class PlayerActivity extends ActionBarActivity {
 
             ImageView image = (ImageView) view.findViewById(R.id.imageView);
 
-            ImageButton play = (ImageButton) view.findViewById(R.id.playButton);
+            final ImageButton play = (ImageButton) view.findViewById(R.id.playButton);
+            final boolean[] playing = {false};
             ImageButton next = (ImageButton) view.findViewById(R.id.nextButton);
             ImageButton prev = (ImageButton) view.findViewById(R.id.prevButton);
 
@@ -86,6 +90,44 @@ public class PlayerActivity extends ActionBarActivity {
             album.setText(s[1]);
 
             Picasso.with(getActivity()).load(s[2]).into(image);
+
+
+            final String[] finalS = s;
+            final int[] pauseat = {0};
+            play.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    playing[0] ^= true;
+
+                    try {
+                        String url = finalS[3]; // your URL here
+                        MediaPlayer mediaPlayer = new MediaPlayer();
+                        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                        mediaPlayer.setDataSource(url);
+                        mediaPlayer.prepare();
+
+                        if (playing[0]) {
+
+                            play.setImageResource(android.R.drawable.ic_media_pause);
+                            //Log.v("play", "play");
+                            mediaPlayer.seekTo(pauseat[0]);
+                            mediaPlayer.start();
+
+                        } else {
+
+                            play.setImageResource(android.R.drawable.ic_media_play);
+                            //Log.v("play", "pause");
+
+                            mediaPlayer.pause();
+                            pauseat[0] = mediaPlayer.getCurrentPosition();
+
+                        }
+
+                    } catch (Exception e){
+
+                    }
+                }
+            });
 
 
             return view;
