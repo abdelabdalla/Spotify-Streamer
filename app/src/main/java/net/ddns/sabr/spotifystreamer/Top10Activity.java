@@ -176,19 +176,36 @@ public class Top10Activity extends ActionBarActivity {
                 FetchSongsClass f = new FetchSongsClass();
                 f.execute(new myTask(savedInstanceState,artistExtra[0]));
 
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                /*listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                        String[] name = new String[songAdapter.getCount()];
+                        String[] album = new String[songAdapter.getCount()];
+                        String[] img = new String[songAdapter.getCount()];
+                        String[] url = new String[songAdapter.getCount()];
+                        String artist = artistExtra[1];
+                        Log.v("position",Integer.toString(position));
 
-                        Song a = songAdapter.getItem(position);
-                        String[] songToPlay = {a.getName(), a.getAlbum(), a.getImgLoc(), a.getUrl(),artistExtra[1]};
+                        for(int i = 0; i < songAdapter.getCount(); i++){
+                            name[i] = songAdapter.getItem(i).getName();
+                            album[i] = songAdapter.getItem(i).getAlbum();
+                            img[i] = songAdapter.getItem(i).getImgLoc();
+                            url[i] = songAdapter.getItem(i).getUrl();
+                        }
 
-                        Intent intent = new Intent(getActivity(), PlayerActivity.class).putExtra("songToPlay", songToPlay);
+                        Intent intent = new Intent(getActivity(), PlayerActivity.class).putExtra("name", name).putExtra("album", album).putExtra("img", img).putExtra("url", url).putExtra("artrist", artist).putExtra("pos", Integer.toString(position));
                         startActivity(intent);
 
                     }
-                });
+                });*/
+
+/*                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Log.v("position",Integer.toString(position));
+                    }
+                });*/
             }
 
             return rootView;

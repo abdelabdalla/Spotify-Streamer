@@ -1,10 +1,10 @@
 package net.ddns.sabr.spotifystreamer;
 
-import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -20,7 +20,31 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
+
 public class PlayerActivity extends ActionBarActivity {
+
+    static SeekBar seek;
+    static MediaPlayer mediaPlayer;
+    static Handler seekHandler = new Handler();
+    static int pos = 0;
+
+    static String[] nameA = {};
+    static String[] albumA = {};
+    static String[] imgA = {};
+    static String[] urlA = {};
+    static String artistS = "";
+
+    static TextView artist;
+    static TextView album;
+    static TextView song;
+
+    static ImageView image;
+
+    static ImageButton play;
+    static boolean[] playing = {false};
+    static ImageButton next;
+    static ImageButton prev;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +62,10 @@ public class PlayerActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.detail, menu);
+        android.support.v7.app.ActionBar a = getSupportActionBar();
+        a.setHomeButtonEnabled(false);
+        a.setDisplayHomeAsUpEnabled(false);
+        a.setDisplayShowHomeEnabled(false);
         return true;
     }
 
@@ -58,41 +86,47 @@ public class PlayerActivity extends ActionBarActivity {
 
     public static class PlayerFragment extends Fragment{
 
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.fragment_player, container, false);
 
-            TextView artist = (TextView) view.findViewById(R.id.artistText);
-            TextView album = (TextView) view.findViewById(R.id.albumText);
-            TextView song = (TextView) view.findViewById(R.id.songText);
+            artist = (TextView) view.findViewById(R.id.artistText);
+            album = (TextView) view.findViewById(R.id.albumText);
+            song = (TextView) view.findViewById(R.id.songText);
 
-            ImageView image = (ImageView) view.findViewById(R.id.imageView);
+            image = (ImageView) view.findViewById(R.id.imageView);
 
-            final ImageButton play = (ImageButton) view.findViewById(R.id.playButton);
-            final boolean[] playing = {false};
-            ImageButton next = (ImageButton) view.findViewById(R.id.nextButton);
-            ImageButton prev = (ImageButton) view.findViewById(R.id.prevButton);
+            play = (ImageButton) view.findViewById(R.id.playButton);
+            next = (ImageButton) view.findViewById(R.id.nextButton);
+            prev = (ImageButton) view.findViewById(R.id.prevButton);
 
-            SeekBar seek = (SeekBar) view.findViewById(R.id.seekBar);
+            seek = (SeekBar) view.findViewById(R.id.seekBar);
 
 
             Intent intent = getActivity().getIntent();
 
-            String[] s = {"On My Mind","On My Mind","https://d3rt1990lpmkn.cloudfront.net/original/8e13218039f81b000553e25522a7f0d7a0600f2e","https://p.scdn.co/mp3-preview/b9547ec4daddc23d1fda0347985f574860d64777","Ellie Goulding"};
-
+/*            String[] nameA = {};
+            String[] albumA = {};
+            String[] imgA = {};
+            String[] urlA = {};
+            String artistS = "";
+            pos = 0;*/
 
             if(intent != null){
-                s = intent.getStringArrayExtra("songToPlay");
+                nameA = intent.getStringArrayExtra("name");
+                albumA  = intent.getStringArrayExtra("album");
+                imgA  = intent.getStringArrayExtra("img");
+                urlA  = intent.getStringArrayExtra("url");
+                artistS  = intent.getStringExtra("artist");
+                Log.v("position",intent.getStringExtra("pos"));
+                pos = Integer.getInteger(intent.getStringExtra("pos"));
             }
 
-            artist.setText(s[4]);
-            song.setText(s[0]);
-            album.setText(s[1]);
+            setup();
 
-            Picasso.with(getActivity()).load(s[2]).into(image);
+            seekUpdate();
 
-
-            final String[] finalS = s;
             final int[] pauseat = {0};
             play.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -100,37 +134,97 @@ public class PlayerActivity extends ActionBarActivity {
                     playing[0] ^= true;
 
                     try {
-                        String url = finalS[3]; // your URL here
-                        MediaPlayer mediaPlayer = new MediaPlayer();
-                        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                        mediaPlayer.setDataSource(url);
-                        mediaPlayer.prepare();
 
                         if (playing[0]) {
 
                             play.setImageResource(android.R.drawable.ic_media_pause);
-                            //Log.v("play", "play");
-                            mediaPlayer.seekTo(pauseat[0]);
+                            Log.v("playing", "play");
+                            if (pauseat[0] < 28) {
+                                mediaPlayer.seekTo(pauseat[0]);
+                            }
                             mediaPlayer.start();
 
                         } else {
 
                             play.setImageResource(android.R.drawable.ic_media_play);
-                            //Log.v("play", "pause");
-
-                            mediaPlayer.pause();
+                            Log.v("playing", "pause");
                             pauseat[0] = mediaPlayer.getCurrentPosition();
+                            mediaPlayer.pause();
 
                         }
 
-                    } catch (Exception e){
+                    } catch (Exception e) {
 
                     }
+                }
+            });
+
+            prev.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    pos--;
+                    setup();
+                }
+            });
+            next.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    pos++;
+                    setup();
+                }
+            });
+
+            seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                    mediaPlayer.seekTo(seekBar.getProgress());
                 }
             });
 
 
             return view;
         }
+
+
+        public void seekUpdate(){
+            seek.setProgress(mediaPlayer.getCurrentPosition());
+            seekHandler.postDelayed(run, 1);
+        }
+
+        public void setup() {
+            artist.setText(artistS);
+            song.setText(nameA[pos]);
+            album.setText(albumA[pos]);
+
+            Picasso.with(getActivity()).load(imgA[pos]).into(image);
+
+            String url = urlA[pos];
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            try {
+                mediaPlayer.setDataSource(url);
+                mediaPlayer.prepare();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            seek.setMax(mediaPlayer.getDuration());
+        }
+
+        Runnable run = new Runnable() {
+            @Override
+            public void run() {
+                seekUpdate();
+            }
+        };
     }
 }

@@ -30,8 +30,7 @@
         </activity>
         <activity
             android:name=".PlayerActivity"
-            android:label="@string/title_activity_player"
-            android:parentActivityName=".Top10Activity" >
+            android:label="@string/title_activity_player">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.ddns.sabr.spotifystreamer.Top10Activity" />
