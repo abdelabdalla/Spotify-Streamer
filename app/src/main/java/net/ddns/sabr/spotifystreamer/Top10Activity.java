@@ -1,12 +1,14 @@
 package net.ddns.sabr.spotifystreamer;
 
 import android.app.Application;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -153,7 +155,6 @@ public class Top10Activity extends ActionBarActivity {
                         String[] img = new String[songAdapter.getCount()];
                         String[] url = new String[songAdapter.getCount()];
                         String artist = artistExtra[1];
-                        Log.v("position",Integer.toString(position));
 
                         for(int i = 0; i < songAdapter.getCount(); i++){
                             name[i] = songAdapter.getItem(i).getName();
@@ -162,8 +163,20 @@ public class Top10Activity extends ActionBarActivity {
                             url[i] = songAdapter.getItem(i).getUrl();
                         }
 
-                        Intent intent = new Intent(getActivity(), PlayerActivity.class).putExtra("name", name).putExtra("album", album).putExtra("img", img).putExtra("url", url).putExtra("artrist", artist).putExtra("pos", position);
-                        startActivity(intent);
+                        Bundle args = new Bundle();
+                        args.putStringArray("name", name);
+                        args.putStringArray("album", album);
+                        args.putStringArray("img", img);
+                        args.putStringArray("url", url);
+                        args.putString("artist", artist);
+                        args.putInt("pos", position);
+                        Log.v("position", Integer.toString(name.length));
+                        DialogFragment f = new PlayerDialogue();
+                        f.setArguments(args);
+                        f.show(getFragmentManager(),"TAG");
+
+                        //TODO Intent intent = new Intent(getActivity(), PlayerActivity.class).putExtra("name", name).putExtra("album", album).putExtra("img", img).putExtra("url", url).putExtra("artist", artist).putExtra("pos", position);
+                        //startActivity(intent);
 
                     }
                 });
@@ -205,8 +218,20 @@ public class Top10Activity extends ActionBarActivity {
                             url[i] = songAdapter.getItem(i).getUrl();
                         }
 
-                        Intent intent = new Intent(getActivity(), PlayerActivity.class).putExtra("name", name).putExtra("album", album).putExtra("img", img).putExtra("url", url).putExtra("artrist", artist).putExtra("pos",position);
-                        startActivity(intent);
+                        Bundle args = new Bundle();
+                        args.putStringArray("name", name);
+                        args.putStringArray("album", album);
+                        args.putStringArray("img", img);
+                        args.putStringArray("url", url);
+                        args.putString("artist", artist);
+                        args.putInt("pos", position);
+                        Log.v("position", artist);
+                        DialogFragment f = new PlayerDialogue();
+                        f.setArguments(args);
+                        f.show(getFragmentManager(), "TAG");
+
+                        //TODO Intent intent = new Intent(getActivity(), PlayerActivity.class).putExtra("name", name).putExtra("album", album).putExtra("img", img).putExtra("url", url).putExtra("artist", artist).putExtra("pos",position);
+                        //startActivity(intent);
 
                     }
                 });

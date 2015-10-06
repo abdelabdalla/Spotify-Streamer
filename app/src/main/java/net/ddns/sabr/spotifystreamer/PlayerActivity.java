@@ -106,13 +106,6 @@ public class PlayerActivity extends ActionBarActivity {
 
             Intent intent = getActivity().getIntent();
 
-/*            String[] nameA = {};
-            String[] albumA = {};
-            String[] imgA = {};
-            String[] urlA = {};
-            String artistS = "";
-            pos = 0;*/
-
             if(intent != null){
                 nameA = intent.getStringArrayExtra("name");
                 albumA  = intent.getStringArrayExtra("album");
