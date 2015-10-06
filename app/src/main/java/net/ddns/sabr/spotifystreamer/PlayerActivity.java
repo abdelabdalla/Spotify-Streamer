@@ -119,8 +119,7 @@ public class PlayerActivity extends ActionBarActivity {
                 imgA  = intent.getStringArrayExtra("img");
                 urlA  = intent.getStringArrayExtra("url");
                 artistS  = intent.getStringExtra("artist");
-                Log.v("position",intent.getStringExtra("pos"));
-                pos = Integer.getInteger(intent.getStringExtra("pos"));
+                pos = intent.getIntExtra("pos",0);
             }
 
             setup();
@@ -163,6 +162,11 @@ public class PlayerActivity extends ActionBarActivity {
                 @Override
                 public void onClick(View v) {
                     pos--;
+                    mediaPlayer.pause();
+                    mediaPlayer.release();
+                    play.setImageResource(android.R.drawable.ic_media_play);
+                    playing[0] = false;
+                    pauseat[0] = 0;
                     setup();
                 }
             });
@@ -170,6 +174,11 @@ public class PlayerActivity extends ActionBarActivity {
                 @Override
                 public void onClick(View v) {
                     pos++;
+                    mediaPlayer.pause();
+                    mediaPlayer.release();
+                    play.setImageResource(android.R.drawable.ic_media_play);
+                    playing[0] = false;
+                    pauseat[0] = 0;
                     setup();
                 }
             });
