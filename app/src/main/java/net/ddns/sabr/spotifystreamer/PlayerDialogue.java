@@ -45,7 +45,7 @@ public class PlayerDialogue extends DialogFragment {
     static ImageView image;
 
     static ImageButton play;
-    static boolean[] playing = {false};
+    static boolean[] playing = {true};
     static ImageButton next;
     static ImageButton prev;
 
@@ -127,9 +127,9 @@ public class PlayerDialogue extends DialogFragment {
             @Override
             public void onClick(View v) {
                 pos--;
-                mediaPlayer.pause();
+                mediaPlayer.stop();
                 mediaPlayer.release();
-                play.setImageResource(android.R.drawable.ic_media_play);
+                play.setImageResource(android.R.drawable.ic_media_pause);
                 playing[0] = false;
                 pauseat[0] = 0;
                 setup();
@@ -139,9 +139,9 @@ public class PlayerDialogue extends DialogFragment {
             @Override
             public void onClick(View v) {
                 pos++;
-                mediaPlayer.pause();
+                mediaPlayer.stop();
                 mediaPlayer.release();
-                play.setImageResource(android.R.drawable.ic_media_play);
+                play.setImageResource(android.R.drawable.ic_media_pause);
                 playing[0] = false;
                 pauseat[0] = 0;
                 setup();
@@ -192,6 +192,7 @@ public class PlayerDialogue extends DialogFragment {
             e.printStackTrace();
         }
         seek.setMax(mediaPlayer.getDuration());
+        mediaPlayer.start();
     }
 
     Runnable run = new Runnable() {
