@@ -86,6 +86,7 @@ public class PlayerDialogue extends DialogFragment {
             pos = intent.getIntExtra("pos",0);
         }*/
 
+
         setup();
 
         seekUpdate();
