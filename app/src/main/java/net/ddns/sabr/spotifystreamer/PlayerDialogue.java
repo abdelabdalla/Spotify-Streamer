@@ -126,7 +126,11 @@ public class PlayerDialogue extends DialogFragment {
         prev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pos--;
+                if(pos == 0){
+                    pos = nameA.length - 1;
+                } else {
+                    pos--;
+                }
                 mediaPlayer.stop();
                 mediaPlayer.release();
                 play.setImageResource(android.R.drawable.ic_media_pause);
@@ -138,7 +142,11 @@ public class PlayerDialogue extends DialogFragment {
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pos++;
+                if(pos == nameA.length - 1){
+                    pos = 0;
+                } else {
+                    pos--;
+                }
                 mediaPlayer.stop();
                 mediaPlayer.release();
                 play.setImageResource(android.R.drawable.ic_media_pause);
