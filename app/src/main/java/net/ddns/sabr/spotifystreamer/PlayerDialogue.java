@@ -145,7 +145,7 @@ public class PlayerDialogue extends DialogFragment {
                 if(pos == nameA.length - 1){
                     pos = 0;
                 } else {
-                    pos--;
+                    pos++;
                 }
                 mediaPlayer.stop();
                 mediaPlayer.release();
