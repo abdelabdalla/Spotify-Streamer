@@ -250,19 +250,8 @@ public class ArtistFragment extends Fragment {
 
                 Artists[] list;
 
-/*                if(artistListt != null && !artistListt.isEmpty()){
-                    list = new Artists[artistListt.size()];
-                    list = artistList.toArray(list);
-                    artistListt.clear();
-                } else */if (!isConnected()) {
-/*
-                    String[] name = params[0].bundle.getStringArray("names");
-                    String[] imgLocs = params[0].bundle.getStringArray("imgLocs");
-                    String[] id = params[0].bundle.getStringArray("id");
-                    list = new Artists[name.length];
-                    for (int i = 0; i < name.length; i++) {
-                        list[i] = new Artists(name[i], imgLocs[i], id[i]);
-                    }*/
+                if (!isConnected()) {
+
                     if(params[0].bundle == null){
                         artist = new Artists[1];
                         artist[0] = new Artists("Enter Name Above","https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Aiga_uparrow.svg/500px-Aiga_uparrow.svg.png","");

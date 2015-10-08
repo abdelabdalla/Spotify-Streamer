@@ -175,9 +175,6 @@ public class Top10Activity extends ActionBarActivity {
                         f.setArguments(args);
                         f.show(getFragmentManager(),"TAG");
 
-                        //TODO Intent intent = new Intent(getActivity(), PlayerActivity.class).putExtra("name", name).putExtra("album", album).putExtra("img", img).putExtra("url", url).putExtra("artist", artist).putExtra("pos", position);
-                        //startActivity(intent);
-
                     }
                 });
 
@@ -229,9 +226,6 @@ public class Top10Activity extends ActionBarActivity {
                         DialogFragment f = new PlayerDialogue();
                         f.setArguments(args);
                         f.show(getFragmentManager(), "TAG");
-
-                        //TODO Intent intent = new Intent(getActivity(), PlayerActivity.class).putExtra("name", name).putExtra("album", album).putExtra("img", img).putExtra("url", url).putExtra("artist", artist).putExtra("pos",position);
-                        //startActivity(intent);
 
                     }
                 });
